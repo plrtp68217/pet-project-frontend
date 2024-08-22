@@ -1,7 +1,6 @@
 import MainPage from '@/pages/MainPage.vue';
 import Products from '@/pages/Products.vue';
 import ProductView from '@/pages/ProductView.vue';
-import ProductView2 from '@/pages/ProductView2.vue';
 import ContactData from '@/pages/ContactData.vue';
 import AboutPage from '@/pages/AboutPage.vue';
 
@@ -20,7 +19,7 @@ const routes = [
 
     {
         path: '/products/:id',
-        component: ProductView2
+        component: ProductView
     },
 
     {
