@@ -35,7 +35,7 @@ export default {
     }
 }
 
-@media (max-width: 1183px) {
+@media (max-width: 1440px) {
     .container__content {
         animation-name: leftBar_animation;
         animation-duration: 200ms;

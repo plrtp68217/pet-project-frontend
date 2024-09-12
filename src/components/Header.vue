@@ -1,15 +1,37 @@
 <template>
 
     <my-dialog v-model:show="dialogVisible">
-        <input class="input_authorization" v-model="username" type="text" placeholder="Имя пользователя">
-        <input class="input_authorization" v-model="password" type="password" placeholder="Пароль">
-        <button @click="Login" class="button_authorization">Войти</button>
+
+
+        <Transition name="bounce">
+            <div v-if="$store.state.isRegistrationDialog" class="dialog_authorization">
+                <h1>Регистрация</h1>
+                <input class="input_authorization" v-model="username" type="text" placeholder="Имя пользователя">
+                <input class="input_authorization" v-model="password" type="password" placeholder="Пароль">
+                <input class="input_authorization" v-model="repeat_password" type="password" placeholder="Повторите пароль">
+                <button @click="Login" class="button_authorization">Зарегистрироваться</button>
+                <div><h3 @click="showAuthorization">У меня уже есть аккаунт</h3></div>
+            </div>
+        </Transition>
+        
+        <Transition name="bounce">
+            <div v-if="$store.state.isAuthorizationDialog" class="dialog_authorization">
+                <h1>Авторизация</h1>
+                <input class="input_authorization" v-model="username" type="text" placeholder="Имя пользователя">
+                <input class="input_authorization" v-model="password" type="password" placeholder="Пароль">
+                <button @click="Login" class="button_authorization">Войти</button>
+                <div><h3 @click="showRegistration">Пройти регистрацию</h3></div>
+                <div v-if="loginError"  class="error">Неверный логин или пароль</div>
+            </div>
+        </Transition>
+
     </my-dialog>
 
     <div class="discont">
         <div>Скидка 10% по промокоду "POLEARTOP"</div>
         <u>Обратный звонок</u>
     </div>
+
     <div class="header">
         <div class="container">
             <div class="nav">
@@ -20,11 +42,15 @@
             </div>
             <div class="favorites">
                 <div class="favorites__item item1">Понравившeeся</div>
-                <div @click="dialogVisible = true" class="favorites__item item2">Авторизация</div>
+                <div v-if="$store.state.isAuthorised" class="favorites__item item2">{{ $store.state.username }}</div>
+                <div v-else>
+                    <div @click="dialogVisible = true" class="favorites__item item2">Войти в профиль</div>
+                </div>
+
             </div>
         </div>
-
     </div>
+
 </template>
 
 <script>
@@ -35,11 +61,11 @@ import FormData from 'form-data';
 export default {
     data() {
         return {
-            isAuthorized: false,
             dialogVisible: false,
             username: '',
             password: '',
-            loginError: '',
+            repeat_password: '',
+            loginError: false,
         }
     },
 
@@ -59,9 +85,32 @@ export default {
                 data: data
             };
 
-            const responseLogin = await axios.request(config)
+            const responseLogin = await axios.request(config);
 
-            this.dialogVisible = false;
+            if (responseLogin.data.status) {
+                this.$store.commit('authorisation', true);
+                this.$store.commit('setUsername', this.username);
+                this.username = '',
+                this.password = '',
+                this.loginError = false;
+                this.dialogVisible = false;
+            }
+
+            else {
+                this.loginError = true;
+            }
+
+            console.log(responseLogin);
+        },
+
+        showAuthorization() {
+            this.$store.state.isAuthorizationDialog = true;
+            this.$store.state.isRegistrationDialog = false;
+        },
+
+        showRegistration() {
+            this.$store.state.isAuthorizationDialog = false;
+            this.$store.state.isRegistrationDialog = true;
         }
     }
 }
@@ -141,6 +190,13 @@ export default {
 
 /* авторизация */
 
+.dialog_authorization {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    
+}
+
 .input_authorization {
     width: 300px;
     height: 30px;
@@ -167,4 +223,23 @@ export default {
 .button_authorization:hover {
     transform: scale(1.1);
 }
+
+.bounce-enter-active {
+  animation: bounce-in 0.5s;
+}
+.bounce-leave-active {
+  animation: bounce-in 0.5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 </style>

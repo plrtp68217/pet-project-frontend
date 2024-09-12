@@ -43,7 +43,8 @@ export default {
         background-color: white;
         padding: 20px 40px;
         border-radius: 18px;
-        display: flex;
-        flex-direction: column;
+        width: 400px;
+        height: 260px;
+        overflow: hidden;
     }
 </style>
